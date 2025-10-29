@@ -1,0 +1,31 @@
+{
+  "name": "physical-examination-app",
+  "version": "1.1.0",
+  "description": "Medical training application for physical examination with manikin connectivity",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8000",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "medical",
+    "training",
+    "examination",
+    "manikin",
+    "education",
+    "healthcare",
+    "auscultation",
+    "respiratory",
+    "cardiac"
+  ],
+  "author": "Medical Training Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/physical-examination-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/physical-examination-app/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/physical-examination-app#readme"
+}
