@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Examination Training System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        /* Role Selection Screen */
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .role-card {
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 40px;
+            width: 280px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .role-card .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .role-card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .role-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Common Styles */
+        .hidden {
+            display: none !important;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        /* Examiner Interface */
+        .examiner-interface {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .control-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .control-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .sound-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sound-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .sound-item label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .sound-item select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+        }
+
+        .sound-item select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #dc3545;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Examinee Interface */
+        .examinee-interface {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .body-system {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .body-system h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .body-system-icon {
+            font-size: 1.5em;
+        }
+
+        .examination-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .exam-point-dropdown {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .exam-point-dropdown label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .exam-point-dropdown select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exam-point-dropdown select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .exam-point-dropdown select.answered {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .exam-point {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exam-point:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .exam-point.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .exam-point input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .exam-point label {
+            cursor: pointer;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .sound-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .sound-info h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .sound-info p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* Registration Form */
+        .registration-form {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+        }
+
+        .registration-form h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .user-info-display {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #667eea;
+        }
+
+        .user-info-display .user-details {
+            display: flex;
+            gap: 30px;
+        }
+
+        .user-info-display .user-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-info-display .user-detail-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .user-info-display .user-detail-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        /* Score Display */
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .score-display h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .score-display p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .score-item {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .score-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .score-item .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .score-item.wrong .score-value {
+            color: #dc3545;
+        }
+
+        .answer-review {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .answer-review h3 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .answer-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            background: white;
+        }
+
+        .answer-item.wrong {
+            border-left-color: #dc3545;
+        }
+
+        .answer-item .location {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .answer-item .answer-line {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .answer-item .correct {
+            color: #28a745;
+        }
+
+        .answer-item .incorrect {
+            color: #dc3545;
+        }
+
+        /* Device Selection Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h3 {
+            color: #333;
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .modal-body {
+            margin: 20px 0;
+        }
+
+        .device-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .device-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .device-item:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .device-icon {
+            font-size: 2em;
+        }
+
+        .device-info {
+            flex: 1;
+        }
+
+        .device-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .device-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .scanning-message {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .scanning-message .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            text-align: right;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .role-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .sound-controls,
+            .examination-points {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-button hidden" id="backButton">← Back</button>
+            <h1>Physical Examination Training System</h1>
+            <p id="headerSubtitle">Select your role to begin</p>
+        </div>
+
+        <div class="content">
+            <!-- Role Selection Screen -->
+            <div id="roleSelection" class="role-selection">
+                <div class="role-card" onclick="selectRole('examiner')">
+                    <div class="icon">👨‍⚕️</div>
+                    <h2>Examiner</h2>
+                    <p>Control and modify respiratory and cardiac sounds for training scenarios</p>
+                </div>
+                <div class="role-card" onclick="selectRole('examinee')">
+                    <div class="icon">🩺</div>
+                    <h2>Examinee</h2>
+                    <p>Select examination points and hear corresponding sounds from the manikin</p>
+                </div>
+            </div>
+
+            <!-- Examinee Registration Form -->
+            <div id="registrationForm" class="registration-form hidden">
+                <h2>👤 Examinee Registration</h2>
+                <div class="form-group">
+                    <label for="examineeName">Full Name *</label>
+                    <input 
+                        type="text" 
+                        id="examineeName" 
+                        placeholder="Enter your full name"
+                        onkeypress="if(event.key==='Enter') startExamination()"
+                    >
+                    <span class="error-message" id="nameError">Please enter your full name</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="staffId">Staff ID *</label>
+                    <input 
+                        type="text" 
+                        id="staffId" 
+                        placeholder="Enter your staff ID"
+                        onkeypress="if(event.key==='Enter') startExamination()"
+                    >
+                    <span class="error-message" id="staffIdError">Please enter your staff ID</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn" id="submitBtn" onclick="startExamination()">Start Examination</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelRegistration()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Examiner Interface -->
+            <div id="examinerInterface" class="examiner-interface hidden">
+                <div class="connection-status">
+                    <div class="status-indicator">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span id="connectionText">Disconnected from Manikin</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="connectDevice('wifi')">Connect WiFi</button>
+                        <button class="btn btn-success" onclick="connectDevice('bluetooth')">Connect Bluetooth</button>
+                        <button class="btn btn-danger hidden" id="disconnectBtn" onclick="disconnectDevice()">Disconnect</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>🫁 Respiratory Sounds Control</h3>
+                    <div class="sound-controls">
+                        <div class="sound-item">
+                            <label for="lungApex">Lung Apex (Upper)</label>
+                            <select id="lungApex" onchange="updateSound('respiratory', 'apex', this.value)">
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="sound-item">
+                            <label for="lungMiddle">Lung Middle</label>
+                            <select id="lungMiddle" onchange="updateSound('respiratory', 'middle', this.value)">
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="sound-item">
+                            <label for="lungBase">Lung Base (Lower)</label>
+                            <select id="lungBase" onchange="updateSound('respiratory', 'base', this.value)">
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="sound-item">
+                            <label for="lungPosterior">Posterior Lung</label>
+                            <select id="lungPosterior" onchange="updateSound('respiratory', 'posterior', this.value)">
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>❤️ Cardiac Sounds Control</h3>
+                    <div class="sound-controls">
+                        <div class="sound-item">
+                            <label for="aortic">Aortic Area</label>
+                            <select id="aortic" onchange="updateSound('cardiac', 'aortic', this.value)">
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="split">Split S2</option>
+                                <option value="stenosis">Aortic Stenosis</option>
+                                <option value="regurgitation">Aortic Regurgitation</option>
+                            </select>
+                        </div>
+                        <div class="sound-item">
+                            <label for="pulmonic">Pulmonic Area</label>
+                            <select id="pulmonic" onchange="updateSound('cardiac', 'pulmonic', this.value)">
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="split">Split S2</option>
+                                <option value="stenosis">Pulmonic Stenosis</option>
+                                <option value="regurgitation">Pulmonic Regurgitation</option>
+                            </select>
+                        </div>
+                        <div class="sound-item">
+                            <label for="tricuspid">Tricuspid Area</label>
+                            <select id="tricuspid" onchange="updateSound('cardiac', 'tricuspid', this.value)">
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="regurgitation">Tricuspid Regurgitation</option>
+                            </select>
+                        </div>
+                        <div class="sound-item">
+                            <label for="mitral">Mitral Area</label>
+                            <select id="mitral" onchange="updateSound('cardiac', 'mitral', this.value)">
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="stenosis">Mitral Stenosis</option>
+                                <option value="regurgitation">Mitral Regurgitation</option>
+                                <option value="prolapse">Mitral Valve Prolapse</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="applyAllSettings()">Apply All Settings to Manikin</button>
+                    <button class="btn btn-secondary" onclick="resetAllSounds()">Reset All to Normal</button>
+                </div>
+            </div>
+
+            <!-- Examinee Interface -->
+            <div id="examineeInterface" class="examinee-interface hidden">
+                <!-- User Info Display -->
+                <div class="user-info-display">
+                    <div class="user-details">
+                        <div class="user-detail-item">
+                            <span class="user-detail-label">Name</span>
+                            <span class="user-detail-value" id="displayName"></span>
+                        </div>
+                        <div class="user-detail-item">
+                            <span class="user-detail-label">Staff ID</span>
+                            <span class="user-detail-value" id="displayStaffId"></span>
+                        </div>
+                    </div>
+                    <button class="btn-logout" onclick="logoutExaminee()">Logout</button>
+                </div>
+
+                <div class="connection-status">
+                    <div class="status-indicator">
+                        <div class="status-dot" id="statusDotExaminee"></div>
+                        <span id="connectionTextExaminee">Disconnected from Manikin</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="connectDeviceExaminee('wifi')">Connect WiFi</button>
+                        <button class="btn btn-success" onclick="connectDeviceExaminee('bluetooth')">Connect Bluetooth</button>
+                        <button class="btn btn-danger hidden" id="disconnectBtnExaminee" onclick="disconnectDeviceExaminee()">Disconnect</button>
+                    </div>
+                </div>
+
+                <div class="body-system">
+                    <h3><span class="body-system-icon">🫁</span>Respiratory System Examination</h3>
+                    <div class="examination-points">
+                        <div class="exam-point-dropdown">
+                            <label for="resp-apex-right-select">Right Apex</label>
+                            <select id="resp-apex-right-select" onchange="recordExamineeAnswer('respiratory', 'apex-right', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-apex-left-select">Left Apex</label>
+                            <select id="resp-apex-left-select" onchange="recordExamineeAnswer('respiratory', 'apex-left', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-middle-right-select">Right Middle Lobe</label>
+                            <select id="resp-middle-right-select" onchange="recordExamineeAnswer('respiratory', 'middle-right', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-middle-left-select">Left Middle Lobe</label>
+                            <select id="resp-middle-left-select" onchange="recordExamineeAnswer('respiratory', 'middle-left', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-base-right-select">Right Base</label>
+                            <select id="resp-base-right-select" onchange="recordExamineeAnswer('respiratory', 'base-right', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-base-left-select">Left Base</label>
+                            <select id="resp-base-left-select" onchange="recordExamineeAnswer('respiratory', 'base-left', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-post-upper-select">Posterior Upper</label>
+                            <select id="resp-post-upper-select" onchange="recordExamineeAnswer('respiratory', 'posterior-upper', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="resp-post-lower-select">Posterior Lower</label>
+                            <select id="resp-post-lower-select" onchange="recordExamineeAnswer('respiratory', 'posterior-lower', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="body-system">
+                    <h3><span class="body-system-icon">❤️</span>Cardiovascular System Examination</h3>
+                    <div class="examination-points">
+                        <div class="exam-point-dropdown">
+                            <label for="card-aortic-select">Aortic Area (2nd ICS Right)</label>
+                            <select id="card-aortic-select" onchange="recordExamineeAnswer('cardiac', 'aortic', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="split">Split S2</option>
+                                <option value="stenosis">Aortic Stenosis</option>
+                                <option value="regurgitation">Aortic Regurgitation</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="card-pulmonic-select">Pulmonic Area (2nd ICS Left)</label>
+                            <select id="card-pulmonic-select" onchange="recordExamineeAnswer('cardiac', 'pulmonic', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="split">Split S2</option>
+                                <option value="stenosis">Pulmonic Stenosis</option>
+                                <option value="regurgitation">Pulmonic Regurgitation</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="card-tricuspid-select">Tricuspid Area (4th ICS Left)</label>
+                            <select id="card-tricuspid-select" onchange="recordExamineeAnswer('cardiac', 'tricuspid', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="regurgitation">Tricuspid Regurgitation</option>
+                            </select>
+                        </div>
+                        <div class="exam-point-dropdown">
+                            <label for="card-mitral-select">Mitral Area (5th ICS Midclavicular)</label>
+                            <select id="card-mitral-select" onchange="recordExamineeAnswer('cardiac', 'mitral', this.value)">
+                                <option value="">-- Select Sound --</option>
+                                <option value="normal">Normal S1-S2</option>
+                                <option value="murmur-systolic">Systolic Murmur</option>
+                                <option value="murmur-diastolic">Diastolic Murmur</option>
+                                <option value="s3">S3 Gallop</option>
+                                <option value="s4">S4 Gallop</option>
+                                <option value="stenosis">Mitral Stenosis</option>
+                                <option value="regurgitation">Mitral Regurgitation</option>
+                                <option value="prolapse">Mitral Valve Prolapse</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="submitExamination()">Submit Examination</button>
+                    <button class="btn btn-secondary" onclick="resetExamination()">Reset All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Selection Modal -->
+    <div id="deviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Select Device</h3>
+            </div>
+            <div class="modal-body">
+                <div id="scanningMessage" class="scanning-message">
+                    <div class="spinner"></div>
+                    <p>Scanning for devices...</p>
+                </div>
+                <ul id="deviceList" class="device-list" style="display: none;"></ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeviceModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state management
+        const appState = {
+            currentRole: null,
+            connected: false,
+            connectionType: null,
+            connectedDevice: null,
+            examineeInfo: {
+                name: '',
+                staffId: ''
+            },
+            // Examiner's correct answers (what they set)
+            examinerSettings: {
+                respiratory: {
+                    'apex-right': 'normal',
+                    'apex-left': 'normal',
+                    'middle-right': 'normal',
+                    'middle-left': 'normal',
+                    'base-right': 'normal',
+                    'base-left': 'normal',
+                    'posterior-upper': 'normal',
+                    'posterior-lower': 'normal'
+                },
+                cardiac: {
+                    'aortic': 'normal',
+                    'pulmonic': 'normal',
+                    'tricuspid': 'normal',
+                    'mitral': 'normal'
+                }
+            },
+            // Examinee's answers
+            examineeAnswers: {
+                respiratory: {},
+                cardiac: {}
+            },
+            respiratorySounds: {
+                apex: 'normal',
+                middle: 'normal',
+                base: 'normal',
+                posterior: 'normal'
+            },
+            cardiacSounds: {
+                aortic: 'normal',
+                pulmonic: 'normal',
+                tricuspid: 'normal',
+                mitral: 'normal'
+            },
+            selectedExamPoints: []
+        };
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deviceModal');
+            if (event.target === modal) {
+                closeDeviceModal();
+            }
+        };
+
+        // Role Selection
+        function selectRole(role) {
+            appState.currentRole = role;
+            document.getElementById('roleSelection').classList.add('hidden');
+            document.getElementById('backButton').classList.remove('hidden');
+            
+            if (role === 'examiner') {
+                document.getElementById('headerSubtitle').textContent = 'Examiner Control Panel';
+                document.getElementById('examinerInterface').classList.remove('hidden');
+            } else {
+                document.getElementById('headerSubtitle').textContent = 'Examinee Registration';
+                document.getElementById('registrationForm').classList.remove('hidden');
+            }
+        }
+
+        // Back to role selection
+        document.getElementById('backButton').addEventListener('click', function() {
+            document.getElementById('roleSelection').classList.remove('hidden');
+            document.getElementById('examinerInterface').classList.add('hidden');
+            document.getElementById('registrationForm').classList.add('hidden');
+            document.getElementById('examineeInterface').classList.add('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('headerSubtitle').textContent = 'Select your role to begin';
+            
+            // Disconnect if connected
+            if (appState.connected) {
+                if (appState.currentRole === 'examiner') {
+                    disconnectDevice();
+                } else {
+                    disconnectDeviceExaminee();
+                }
+            }
+            
+            // Clear examinee info
+            appState.examineeInfo = { name: '', staffId: '' };
+            document.getElementById('examineeName').value = '';
+            document.getElementById('staffId').value = '';
+            
+            appState.currentRole = null;
+        });
+
+        // Registration Form Functions
+        function startExamination() {
+            console.log('Start Examination button clicked!');
+            
+            const name = document.getElementById('examineeName').value.trim();
+            const staffId = document.getElementById('staffId').value.trim();
+            
+            console.log('Name:', name, 'Staff ID:', staffId);
+            
+            // Clear previous errors
+            document.getElementById('examineeName').classList.remove('error');
+            document.getElementById('staffId').classList.remove('error');
+            document.getElementById('nameError').classList.remove('show');
+            document.getElementById('staffIdError').classList.remove('show');
+            
+            // Validation
+            let isValid = true;
+            
+            if (name === '' || name.length < 2) {
+                document.getElementById('examineeName').classList.add('error');
+                document.getElementById('nameError').classList.add('show');
+                isValid = false;
+                console.log('Name validation failed');
+            }
+            
+            if (staffId === '' || staffId.length < 1) {
+                document.getElementById('staffId').classList.add('error');
+                document.getElementById('staffIdError').classList.add('show');
+                isValid = false;
+                console.log('Staff ID validation failed');
+            }
+            
+            if (!isValid) {
+                console.log('Validation failed - stopping');
+                return;
+            }
+            
+            console.log('Validation passed!');
+            
+            // Save examinee info
+            appState.examineeInfo.name = name;
+            appState.examineeInfo.staffId = staffId;
+            
+            console.log('Saved to appState:', appState.examineeInfo);
+            
+            // Update display
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayStaffId').textContent = staffId;
+            
+            console.log('Updated display elements');
+            
+            // Show examinee interface
+            document.getElementById('registrationForm').classList.add('hidden');
+            document.getElementById('examineeInterface').classList.remove('hidden');
+            document.getElementById('headerSubtitle').textContent = 'Examinee Examination Sheet';
+            
+            console.log('Interface switched successfully!');
+            console.log('Examinee registered:', appState.examineeInfo);
+        }
+
+        function cancelRegistration() {
+            document.getElementById('registrationForm').classList.add('hidden');
+            document.getElementById('roleSelection').classList.remove('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('headerSubtitle').textContent = 'Select your role to begin';
+            
+            // Clear form
+            document.getElementById('examineeName').value = '';
+            document.getElementById('staffId').value = '';
+            document.getElementById('examineeName').classList.remove('error');
+            document.getElementById('staffId').classList.remove('error');
+            document.getElementById('nameError').classList.remove('show');
+            document.getElementById('staffIdError').classList.remove('show');
+            
+            appState.currentRole = null;
+        }
+
+        function logoutExaminee() {
+            if (confirm('Are you sure you want to logout? Your session will be ended.')) {
+                // Disconnect if connected
+                if (appState.connected) {
+                    disconnectDeviceExaminee();
+                }
+                
+                // Clear answers
+                appState.examineeAnswers = {
+                    respiratory: {},
+                    cardiac: {}
+                };
+                
+                // Clear all selections
+                document.querySelectorAll('.exam-point-dropdown select').forEach(select => {
+                    select.value = '';
+                    select.classList.remove('answered');
+                });
+                
+                // Show body systems again if they were hidden
+                document.querySelectorAll('.body-system').forEach(el => el.style.display = 'block');
+                
+                // Return to registration
+                document.getElementById('examineeInterface').classList.add('hidden');
+                document.getElementById('registrationForm').classList.remove('hidden');
+                document.getElementById('headerSubtitle').textContent = 'Examinee Registration';
+                
+                // Clear form
+                document.getElementById('examineeName').value = '';
+                document.getElementById('staffId').value = '';
+                appState.examineeInfo = { name: '', staffId: '' };
+            }
+        }
+
+        // Device Connection - Examiner
+        let currentConnectionType = null;
+        let currentUserRole = null;
+
+        function connectDevice(type) {
+            currentConnectionType = type;
+            currentUserRole = 'examiner';
+            showDeviceSelectionModal(type);
+        }
+
+        function showDeviceSelectionModal(type) {
+            const modal = document.getElementById('deviceModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const scanningMessage = document.getElementById('scanningMessage');
+            const deviceList = document.getElementById('deviceList');
+            
+            modalTitle.textContent = `Connect via ${type.toUpperCase()}`;
+            modal.classList.add('show');
+            scanningMessage.style.display = 'block';
+            deviceList.style.display = 'none';
+            deviceList.innerHTML = '';
+            
+            // Simulate device scanning
+            setTimeout(() => {
+                scanningMessage.style.display = 'none';
+                deviceList.style.display = 'block';
+                
+                // Generate mock devices based on connection type
+                const devices = generateMockDevices(type);
+                
+                devices.forEach(device => {
+                    const li = document.createElement('li');
+                    li.className = 'device-item';
+                    li.onclick = () => selectDevice(device);
+                    li.innerHTML = `
+                        <div class="device-icon">${device.icon}</div>
+                        <div class="device-info">
+                            <div class="device-name">${device.name}</div>
+                            <div class="device-details">${device.details}</div>
+                        </div>
+                    `;
+                    deviceList.appendChild(li);
+                });
+            }, 2000);
+        }
+
+        function generateMockDevices(type) {
+            if (type === 'wifi') {
+                return [
+                    {
+                        name: 'Manikin-Training-01',
+                        details: 'IP: 192.168.1.100 | Signal: Strong',
+                        icon: '📡',
+                        id: 'manikin_01_wifi'
+                    },
+                    {
+                        name: 'Manikin-Training-02',
+                        details: 'IP: 192.168.1.101 | Signal: Medium',
+                        icon: '📡',
+                        id: 'manikin_02_wifi'
+                    },
+                    {
+                        name: 'Manikin-Training-03',
+                        details: 'IP: 192.168.1.102 | Signal: Strong',
+                        icon: '📡',
+                        id: 'manikin_03_wifi'
+                    }
+                ];
+            } else {
+                return [
+                    {
+                        name: 'SimMan Manikin A',
+                        details: 'MAC: AA:BB:CC:DD:EE:01 | Paired',
+                        icon: '🔵',
+                        id: 'manikin_a_bt'
+                    },
+                    {
+                        name: 'SimMan Manikin B',
+                        details: 'MAC: AA:BB:CC:DD:EE:02',
+                        icon: '🔵',
+                        id: 'manikin_b_bt'
+                    },
+                    {
+                        name: 'Training Manikin C',
+                        details: 'MAC: AA:BB:CC:DD:EE:03 | Nearby',
+                        icon: '🔵',
+                        id: 'manikin_c_bt'
+                    }
+                ];
+            }
+        }
+
+        function selectDevice(device) {
+            closeDeviceModal();
+            
+            // Show connecting message
+            const statusDot = document.getElementById(currentUserRole === 'examiner' ? 'statusDot' : 'statusDotExaminee');
+            const connectionText = document.getElementById(currentUserRole === 'examiner' ? 'connectionText' : 'connectionTextExaminee');
+            
+            connectionText.textContent = `Connecting to ${device.name}...`;
+            
+            setTimeout(() => {
+                appState.connected = true;
+                appState.connectionType = currentConnectionType;
+                appState.connectedDevice = device;
+                
+                statusDot.classList.add('connected');
+                connectionText.textContent = `Connected to ${device.name} via ${currentConnectionType.toUpperCase()}`;
+                
+                const disconnectBtn = document.getElementById(currentUserRole === 'examiner' ? 'disconnectBtn' : 'disconnectBtnExaminee');
+                disconnectBtn.classList.remove('hidden');
+                
+                // Hide connect buttons
+                const interfaceId = currentUserRole === 'examiner' ? 'examinerInterface' : 'examineeInterface';
+                document.querySelectorAll(`#${interfaceId} .btn-success`).forEach(btn => {
+                    btn.classList.add('hidden');
+                });
+                
+                alert(`Successfully connected to ${device.name} via ${currentConnectionType.toUpperCase()}!`);
+            }, 1500);
+        }
+
+        function closeDeviceModal() {
+            const modal = document.getElementById('deviceModal');
+            modal.classList.remove('show');
+        }
+
+        function disconnectDevice() {
+            if (confirm('Are you sure you want to disconnect from the manikin?')) {
+                appState.connected = false;
+                appState.connectionType = null;
+                appState.connectedDevice = null;
+                
+                const statusDot = document.getElementById('statusDot');
+                const connectionText = document.getElementById('connectionText');
+                const disconnectBtn = document.getElementById('disconnectBtn');
+                
+                statusDot.classList.remove('connected');
+                connectionText.textContent = 'Disconnected from Manikin';
+                disconnectBtn.classList.add('hidden');
+                
+                // Show connect buttons
+                document.querySelectorAll('#examinerInterface .btn-success').forEach(btn => {
+                    btn.classList.remove('hidden');
+                });
+                
+                alert('Disconnected from manikin successfully.');
+            }
+        }
+
+        // Device Connection - Examinee
+        function connectDeviceExaminee(type) {
+            currentConnectionType = type;
+            currentUserRole = 'examinee';
+            showDeviceSelectionModal(type);
+        }
+
+        function disconnectDeviceExaminee() {
+            if (confirm('Are you sure you want to disconnect from the manikin?')) {
+                appState.connected = false;
+                appState.connectionType = null;
+                appState.connectedDevice = null;
+                
+                const statusDot = document.getElementById('statusDotExaminee');
+                const connectionText = document.getElementById('connectionTextExaminee');
+                const disconnectBtn = document.getElementById('disconnectBtnExaminee');
+                
+                statusDot.classList.remove('connected');
+                connectionText.textContent = 'Disconnected from Manikin';
+                disconnectBtn.classList.add('hidden');
+                
+                document.querySelectorAll('#examineeInterface .btn-success').forEach(btn => {
+                    btn.classList.remove('hidden');
+                });
+                
+                alert('Disconnected from manikin successfully.');
+            }
+        }
+
+        // Sound Updates - Examiner
+        function updateSound(system, location, sound) {
+            if (system === 'respiratory') {
+                appState.respiratorySounds[location] = sound;
+                // Map to examiner settings for comparison
+                if (location === 'apex') {
+                    appState.examinerSettings.respiratory['apex-right'] = sound;
+                    appState.examinerSettings.respiratory['apex-left'] = sound;
+                } else if (location === 'middle') {
+                    appState.examinerSettings.respiratory['middle-right'] = sound;
+                    appState.examinerSettings.respiratory['middle-left'] = sound;
+                } else if (location === 'base') {
+                    appState.examinerSettings.respiratory['base-right'] = sound;
+                    appState.examinerSettings.respiratory['base-left'] = sound;
+                } else if (location === 'posterior') {
+                    appState.examinerSettings.respiratory['posterior-upper'] = sound;
+                    appState.examinerSettings.respiratory['posterior-lower'] = sound;
+                }
+            } else if (system === 'cardiac') {
+                appState.cardiacSounds[location] = sound;
+                // Store directly for cardiac
+                appState.examinerSettings.cardiac[location] = sound;
+            }
+            
+            console.log(`Updated ${system} sound at ${location} to ${sound}`);
+            console.log('Current examiner settings:', appState.examinerSettings);
+            
+            if (appState.connected) {
+                // Simulate sending data to manikin
+                console.log(`Sending to manikin via ${appState.connectionType}:`, {
+                    system,
+                    location,
+                    sound
+                });
+            }
+        }
+
+        function applyAllSettings() {
+            if (!appState.connected) {
+                alert('Please connect to the manikin first!');
+                return;
+            }
+            
+            // Show applying message
+            const applyBtn = event.target;
+            const originalText = applyBtn.textContent;
+            applyBtn.textContent = 'Applying Settings...';
+            applyBtn.disabled = true;
+            
+            // Simulate applying all settings with delay
+            setTimeout(() => {
+                console.log('Applying all settings to manikin:', {
+                    respiratory: appState.respiratorySounds,
+                    cardiac: appState.cardiacSounds,
+                    examinerSettings: appState.examinerSettings
+                });
+                
+                applyBtn.textContent = '✓ Settings Applied!';
+                applyBtn.style.background = '#28a745';
+                
+                alert('All settings have been applied to the manikin successfully!\n\nRespiratory Settings:\n' +
+                    `- Apex: ${appState.respiratorySounds.apex}\n` +
+                    `- Middle: ${appState.respiratorySounds.middle}\n` +
+                    `- Base: ${appState.respiratorySounds.base}\n` +
+                    `- Posterior: ${appState.respiratorySounds.posterior}\n\n` +
+                    'Cardiac Settings:\n' +
+                    `- Aortic: ${appState.cardiacSounds.aortic}\n` +
+                    `- Pulmonic: ${appState.cardiacSounds.pulmonic}\n` +
+                    `- Tricuspid: ${appState.cardiacSounds.tricuspid}\n` +
+                    `- Mitral: ${appState.cardiacSounds.mitral}`
+                );
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    applyBtn.textContent = originalText;
+                    applyBtn.disabled = false;
+                    applyBtn.style.background = '';
+                }, 2000);
+            }, 1000);
+        }
+
+        function resetAllSounds() {
+            // Reset all dropdowns
+            document.querySelectorAll('.sound-item select').forEach(select => {
+                select.value = 'normal';
+            });
+            
+            // Reset state
+            appState.respiratorySounds = {
+                apex: 'normal',
+                middle: 'normal',
+                base: 'normal',
+                posterior: 'normal'
+            };
+            appState.cardiacSounds = {
+                aortic: 'normal',
+                pulmonic: 'normal',
+                tricuspid: 'normal',
+                mitral: 'normal'
+            };
+            
+            if (appState.connected) {
+                alert('All sounds have been reset to normal!');
+            }
+        }
+
+        // Examination Point Selection - Examinee
+        function recordExamineeAnswer(system, location, sound) {
+            if (sound === '') {
+                // If empty selection, remove the answer
+                delete appState.examineeAnswers[system][location];
+            } else {
+                appState.examineeAnswers[system][location] = sound;
+                // Add visual feedback
+                const selectElement = document.getElementById(`${system === 'respiratory' ? 'resp' : 'card'}-${location}-select`);
+                if (selectElement) {
+                    selectElement.classList.add('answered');
+                }
+            }
+            
+            console.log('Examinee answers:', appState.examineeAnswers);
+        }
+
+        function submitExamination() {
+            if (!appState.connected) {
+                alert('❌ Please connect to the manikin first before submitting!');
+                return;
+            }
+
+            // Check if all questions are answered
+            const respAnswers = Object.keys(appState.examineeAnswers.respiratory).length;
+            const cardAnswers = Object.keys(appState.examineeAnswers.cardiac).length;
+            
+            console.log('Respiratory answers:', respAnswers, 'Cardiac answers:', cardAnswers);
+            console.log('Current answers:', appState.examineeAnswers);
+            
+            if (respAnswers < 8 || cardAnswers < 4) {
+                const missing = [];
+                if (respAnswers < 8) missing.push(`${8 - respAnswers} respiratory`);
+                if (cardAnswers < 4) missing.push(`${4 - cardAnswers} cardiac`);
+                
+                if (!confirm(`⚠️ You have not answered all questions!\n\nMissing: ${missing.join(' and ')} location(s).\n\nDo you want to submit anyway?`)) {
+                    return;
+                }
+            }
+
+            // Show submitting message
+            const submitBtn = event.target;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+
+            // Simulate submission delay
+            setTimeout(() => {
+                // Calculate score
+                const results = calculateScore();
+                displayResults(results);
+                
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 1000);
+        }
+
+        function calculateScore() {
+            let correctResp = 0;
+            let totalResp = 8;
+            let correctCard = 0;
+            let totalCard = 4;
+            
+            const details = {
+                respiratory: [],
+                cardiac: []
+            };
+
+            // Check respiratory answers
+            for (let location in appState.examinerSettings.respiratory) {
+                const correctAnswer = appState.examinerSettings.respiratory[location];
+                const examineeAnswer = appState.examineeAnswers.respiratory[location] || 'Not answered';
+                const isCorrect = correctAnswer === examineeAnswer;
+                
+                if (isCorrect) correctResp++;
+                
+                details.respiratory.push({
+                    location: location.replace(/-/g, ' ').toUpperCase(),
+                    correct: correctAnswer,
+                    examinee: examineeAnswer,
+                    isCorrect: isCorrect
+                });
+            }
+
+            // Check cardiac answers
+            for (let location in appState.examinerSettings.cardiac) {
+                const correctAnswer = appState.examinerSettings.cardiac[location];
+                const examineeAnswer = appState.examineeAnswers.cardiac[location] || 'Not answered';
+                const isCorrect = correctAnswer === examineeAnswer;
+                
+                if (isCorrect) correctCard++;
+                
+                details.cardiac.push({
+                    location: location.toUpperCase(),
+                    correct: correctAnswer,
+                    examinee: examineeAnswer,
+                    isCorrect: isCorrect
+                });
+            }
+
+            const totalCorrect = correctResp + correctCard;
+            const totalQuestions = totalResp + totalCard;
+            const percentage = Math.round((totalCorrect / totalQuestions) * 100);
+
+            return {
+                totalCorrect,
+                totalQuestions,
+                percentage,
+                correctResp,
+                totalResp,
+                correctCard,
+                totalCard,
+                details
+            };
+        }
+
+        function displayResults(results) {
+            // Create results display
+            const resultsHTML = `
+                <div class="score-display">
+                    <h2>Examination Score: ${results.percentage}%</h2>
+                    <p>${results.totalCorrect} out of ${results.totalQuestions} correct</p>
+                    
+                    <div class="score-breakdown">
+                        <div class="score-item ${results.correctResp === results.totalResp ? '' : 'wrong'}">
+                            <h4>Respiratory System</h4>
+                            <div class="score-value">${results.correctResp}/${results.totalResp}</div>
+                        </div>
+                        <div class="score-item ${results.correctCard === results.totalCard ? '' : 'wrong'}">
+                            <h4>Cardiac System</h4>
+                            <div class="score-value">${results.correctCard}/${results.totalCard}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-review">
+                    <h3>🫁 Respiratory System - Detailed Review</h3>
+                    ${results.details.respiratory.map(item => `
+                        <div class="answer-item ${item.isCorrect ? '' : 'wrong'}">
+                            <div class="location">${item.location}</div>
+                            <div class="answer-line">
+                                <strong>Your Answer:</strong> 
+                                <span class="${item.isCorrect ? 'correct' : 'incorrect'}">${item.examinee}</span>
+                            </div>
+                            ${!item.isCorrect ? `
+                                <div class="answer-line">
+                                    <strong>Correct Answer:</strong> 
+                                    <span class="correct">${item.correct}</span>
+                                </div>
+                            ` : '<div class="answer-line correct">✓ Correct!</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="answer-review">
+                    <h3>❤️ Cardiovascular System - Detailed Review</h3>
+                    ${results.details.cardiac.map(item => `
+                        <div class="answer-item ${item.isCorrect ? '' : 'wrong'}">
+                            <div class="location">${item.location}</div>
+                            <div class="answer-line">
+                                <strong>Your Answer:</strong> 
+                                <span class="${item.isCorrect ? 'correct' : 'incorrect'}">${item.examinee}</span>
+                            </div>
+                            ${!item.isCorrect ? `
+                                <div class="answer-line">
+                                    <strong>Correct Answer:</strong> 
+                                    <span class="correct">${item.correct}</span>
+                                </div>
+                            ` : '<div class="answer-line correct">✓ Correct!</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="printResults()">Print Results</button>
+                    <button class="btn btn-secondary" onclick="retakeExamination()">Retake Examination</button>
+                    <button class="btn btn-danger" onclick="logoutExaminee()">Logout</button>
+                </div>
+            `;
+
+            // Hide examination interface, show results
+            document.querySelectorAll('.body-system').forEach(el => el.style.display = 'none');
+            document.querySelector('#examineeInterface .action-buttons').innerHTML = resultsHTML;
+
+            // Log results for record keeping
+            console.log('Examination Results:', {
+                examinee: appState.examineeInfo,
+                score: results,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function resetExamination() {
+            if (confirm('Are you sure you want to reset all your answers?')) {
+                // Clear all selections
+                document.querySelectorAll('.exam-point-dropdown select').forEach(select => {
+                    select.value = '';
+                    select.classList.remove('answered');
+                });
+                
+                // Reset answers
+                appState.examineeAnswers = {
+                    respiratory: {},
+                    cardiac: {}
+                };
+                
+                console.log('Examination reset');
+            }
+        }
+
+        function printResults() {
+            window.print();
+        }
+
+        function retakeExamination() {
+            // Show examination interface again
+            document.querySelectorAll('.body-system').forEach(el => el.style.display = 'block');
+            
+            // Reset the action buttons
+            const actionButtons = document.querySelector('#examineeInterface .action-buttons');
+            actionButtons.innerHTML = `
+                <button class="btn" onclick="submitExamination()">Submit Examination</button>
+                <button class="btn btn-secondary" onclick="resetExamination()">Reset All</button>
+            `;
+            
+            // Reset all answers
+            resetExamination();
+        }
+
+        function getSoundDescription(pointId) {
+            const descriptions = {
+                'resp-apex-right': 'Normal vesicular breath sounds at the right upper lobe',
+                'resp-apex-left': 'Normal vesicular breath sounds at the left upper lobe',
+                'resp-middle-right': 'Normal bronchovesicular sounds in the right middle lobe',
+                'resp-middle-left': 'Normal bronchovesicular sounds in the left middle lobe',
+                'resp-base-right': 'Normal vesicular breath sounds at the right lower lobe',
+                'resp-base-left': 'Normal vesicular breath sounds at the left lower lobe',
+                'resp-post-upper': 'Normal breath sounds in the posterior upper region',
+                'resp-post-lower': 'Normal breath sounds in the posterior lower region',
+                'card-aortic': 'Normal S1 and S2 heart sounds at the aortic area',
+                'card-pulmonic': 'Normal S1 and S2 heart sounds at the pulmonic area',
+                'card-tricuspid': 'Normal S1 and S2 heart sounds at the tricuspid area',
+                'card-mitral': 'Normal S1 and S2 heart sounds at the mitral area',
+                'card-apex': 'Normal heart sounds at the point of maximal impulse'
+            };
+            
+            return descriptions[pointId] || 'Listen carefully to the sounds at this location';
+        }
+    </script>
+</body>
+</html>
