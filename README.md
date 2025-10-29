@@ -1,4 +1,3 @@
-# physical-examination-app
 # Physical Examination Training System
 
 A comprehensive web-based training application for medical students to practice physical examination skills using a connected manikin.
