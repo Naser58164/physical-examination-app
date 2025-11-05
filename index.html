@@ -561,6 +561,83 @@
             color: #dc3545;
         }
 
+        /* Audio Player Styles */
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .audio-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .audio-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .audio-btn.playing {
+            background: #28a745;
+            animation: pulse-audio 1s infinite;
+        }
+
+        @keyframes pulse-audio {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .audio-icon {
+            font-size: 1.1em;
+        }
+
+        .sound-preview {
+            background: #f0f4ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .sound-preview.active {
+            display: block;
+        }
+
+        .sound-preview p {
+            margin: 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+            cursor: pointer;
+        }
+
         /* Device Selection Modal */
         .modal {
             display: none;
@@ -796,6 +873,14 @@
                                 <option value="diminished">Diminished</option>
                                 <option value="absent">Absent</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('respiratory', 'apex', document.getElementById('lungApex').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('respiratory', 'apex', document.getElementById('lungApex').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                         <div class="sound-item">
                             <label for="lungMiddle">Lung Middle</label>
@@ -808,6 +893,14 @@
                                 <option value="diminished">Diminished</option>
                                 <option value="absent">Absent</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('respiratory', 'middle', document.getElementById('lungMiddle').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('respiratory', 'middle', document.getElementById('lungMiddle').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                         <div class="sound-item">
                             <label for="lungBase">Lung Base (Lower)</label>
@@ -820,6 +913,14 @@
                                 <option value="diminished">Diminished</option>
                                 <option value="absent">Absent</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('respiratory', 'base', document.getElementById('lungBase').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('respiratory', 'base', document.getElementById('lungBase').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                         <div class="sound-item">
                             <label for="lungPosterior">Posterior Lung</label>
@@ -832,6 +933,14 @@
                                 <option value="diminished">Diminished</option>
                                 <option value="absent">Absent</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('respiratory', 'posterior', document.getElementById('lungPosterior').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('respiratory', 'posterior', document.getElementById('lungPosterior').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -851,6 +960,14 @@
                                 <option value="stenosis">Aortic Stenosis</option>
                                 <option value="regurgitation">Aortic Regurgitation</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('cardiac', 'aortic', document.getElementById('aortic').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('cardiac', 'aortic', document.getElementById('aortic').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                         <div class="sound-item">
                             <label for="pulmonic">Pulmonic Area</label>
@@ -864,6 +981,14 @@
                                 <option value="stenosis">Pulmonic Stenosis</option>
                                 <option value="regurgitation">Pulmonic Regurgitation</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('cardiac', 'pulmonic', document.getElementById('pulmonic').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('cardiac', 'pulmonic', document.getElementById('pulmonic').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                         <div class="sound-item">
                             <label for="tricuspid">Tricuspid Area</label>
@@ -875,6 +1000,14 @@
                                 <option value="s4">S4 Gallop</option>
                                 <option value="regurgitation">Tricuspid Regurgitation</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('cardiac', 'tricuspid', document.getElementById('tricuspid').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('cardiac', 'tricuspid', document.getElementById('tricuspid').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                         <div class="sound-item">
                             <label for="mitral">Mitral Area</label>
@@ -888,6 +1021,14 @@
                                 <option value="regurgitation">Mitral Regurgitation</option>
                                 <option value="prolapse">Mitral Valve Prolapse</option>
                             </select>
+                            <div class="audio-controls">
+                                <button class="audio-btn" onclick="playSound('cardiac', 'mitral', document.getElementById('mitral').value)">
+                                    <span class="audio-icon">🔊</span> Preview
+                                </button>
+                                <button class="audio-btn" onclick="sendToManikin('cardiac', 'mitral', document.getElementById('mitral').value)">
+                                    <span class="audio-icon">📡</span> Send to Manikin
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1135,6 +1276,10 @@
                 name: '',
                 staffId: ''
             },
+            // Audio system
+            audioContext: null,
+            currentAudio: null,
+            audioLibrary: {},
             // Examiner's correct answers (what they set)
             examinerSettings: {
                 respiratory: {
@@ -1181,6 +1326,352 @@
                 closeDeviceModal();
             }
         };
+
+        // Audio System
+        function initAudioSystem() {
+            // Initialize Web Audio Context
+            if (!appState.audioContext) {
+                appState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // Define sound library with synthesized sounds or URLs
+            appState.audioLibrary = {
+                respiratory: {
+                    normal: {
+                        description: 'Normal vesicular breath sounds',
+                        frequency: 200,
+                        duration: 2,
+                        pattern: 'smooth'
+                    },
+                    wheeze: {
+                        description: 'High-pitched whistling sound',
+                        frequency: 800,
+                        duration: 2,
+                        pattern: 'whistle'
+                    },
+                    crackles: {
+                        description: 'Discontinuous popping sounds',
+                        frequency: 600,
+                        duration: 1.5,
+                        pattern: 'crackling'
+                    },
+                    rhonchi: {
+                        description: 'Low-pitched snoring sound',
+                        frequency: 150,
+                        duration: 2,
+                        pattern: 'rumble'
+                    },
+                    stridor: {
+                        description: 'High-pitched inspiratory sound',
+                        frequency: 1000,
+                        duration: 1.5,
+                        pattern: 'harsh'
+                    },
+                    diminished: {
+                        description: 'Reduced breath sound intensity',
+                        frequency: 180,
+                        duration: 2,
+                        pattern: 'quiet'
+                    },
+                    absent: {
+                        description: 'No breath sounds audible',
+                        frequency: 0,
+                        duration: 0.5,
+                        pattern: 'silent'
+                    }
+                },
+                cardiac: {
+                    normal: {
+                        description: 'Normal S1-S2 heart sounds (Lub-Dub)',
+                        frequency: 100,
+                        duration: 0.8,
+                        pattern: 'lub-dub'
+                    },
+                    'murmur-systolic': {
+                        description: 'Systolic murmur (whooshing between beats)',
+                        frequency: 300,
+                        duration: 1,
+                        pattern: 'whoosh-systolic'
+                    },
+                    'murmur-diastolic': {
+                        description: 'Diastolic murmur',
+                        frequency: 250,
+                        duration: 1,
+                        pattern: 'whoosh-diastolic'
+                    },
+                    s3: {
+                        description: 'S3 gallop (Kentucky)',
+                        frequency: 80,
+                        duration: 0.9,
+                        pattern: 'gallop-3'
+                    },
+                    s4: {
+                        description: 'S4 gallop (Tennessee)',
+                        frequency: 90,
+                        duration: 0.9,
+                        pattern: 'gallop-4'
+                    },
+                    split: {
+                        description: 'Split S2 sound',
+                        frequency: 120,
+                        duration: 0.85,
+                        pattern: 'split'
+                    },
+                    stenosis: {
+                        description: 'Valve stenosis murmur',
+                        frequency: 400,
+                        duration: 1.2,
+                        pattern: 'harsh-murmur'
+                    },
+                    regurgitation: {
+                        description: 'Valve regurgitation murmur',
+                        frequency: 350,
+                        duration: 1.1,
+                        pattern: 'blowing-murmur'
+                    },
+                    prolapse: {
+                        description: 'Mitral valve prolapse click',
+                        frequency: 200,
+                        duration: 0.7,
+                        pattern: 'click-murmur'
+                    }
+                }
+            };
+        }
+
+        // Play sound preview
+        function playSound(system, location, soundType) {
+            console.log(`Playing ${system} sound: ${soundType} at ${location}`);
+            
+            // Initialize audio if not done
+            if (!appState.audioContext) {
+                initAudioSystem();
+            }
+            
+            // Stop any currently playing sound
+            stopCurrentSound();
+            
+            // Get sound config
+            const soundConfig = appState.audioLibrary[system][soundType];
+            
+            if (!soundConfig) {
+                alert(`Sound type "${soundType}" not found!`);
+                return;
+            }
+            
+            // Show playing feedback
+            const button = event.target.closest('.audio-btn');
+            if (button) {
+                button.classList.add('playing');
+                button.disabled = true;
+            }
+            
+            // Generate and play sound
+            synthesizeSound(soundConfig, () => {
+                // Callback when sound finishes
+                if (button) {
+                    button.classList.remove('playing');
+                    button.disabled = false;
+                }
+            });
+            
+            // Show sound description
+            console.log(`🔊 Playing: ${soundConfig.description}`);
+            alert(`🔊 Playing ${soundConfig.description}\n\nDuration: ${soundConfig.duration}s`);
+        }
+
+        // Synthesize sound using Web Audio API
+        function synthesizeSound(config, callback) {
+            const audioCtx = appState.audioContext;
+            const duration = config.duration;
+            
+            if (config.pattern === 'silent') {
+                // Silent sound (absent breath sounds)
+                setTimeout(callback, 500);
+                return;
+            }
+            
+            // Create oscillator and gain node
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            // Configure based on pattern
+            switch (config.pattern) {
+                case 'smooth':
+                    // Normal breath sounds - gentle noise
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(500, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                    break;
+                    
+                case 'whistle':
+                    // Wheezing - high-pitched whistle
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(config.frequency * 1.2, audioCtx.currentTime + duration);
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    break;
+                    
+                case 'crackling':
+                    // Crackles - discontinuous pops
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                    // Create crackling pattern
+                    for (let i = 0; i < 10; i++) {
+                        const time = audioCtx.currentTime + (i * duration / 10);
+                        gainNode.gain.setValueAtTime(0.2, time);
+                        gainNode.gain.setValueAtTime(0, time + 0.05);
+                    }
+                    break;
+                    
+                case 'rumble':
+                    // Rhonchi - low rumble
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    break;
+                    
+                case 'harsh':
+                    // Stridor - harsh high-pitched
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.18, audioCtx.currentTime);
+                    break;
+                    
+                case 'quiet':
+                    // Diminished - quiet version of normal
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    break;
+                    
+                case 'lub-dub':
+                    // Normal heart sounds
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    // S1 (lub)
+                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    // Pause
+                    gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.15);
+                    // S2 (dub)
+                    gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime + 0.4);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    break;
+                    
+                case 'whoosh-systolic':
+                case 'whoosh-diastolic':
+                case 'harsh-murmur':
+                case 'blowing-murmur':
+                    // Murmurs - continuous whooshing
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    oscillator.frequency.linearRampToValueAtTime(config.frequency * 1.5, audioCtx.currentTime + duration / 2);
+                    oscillator.frequency.linearRampToValueAtTime(config.frequency, audioCtx.currentTime + duration);
+                    filter.type = 'bandpass';
+                    filter.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    break;
+                    
+                case 'gallop-3':
+                case 'gallop-4':
+                    // Gallop rhythms - three beats
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    // Three beats pattern
+                    for (let i = 0; i < 3; i++) {
+                        const time = audioCtx.currentTime + (i * 0.25);
+                        gainNode.gain.setValueAtTime(0.3, time);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+                        gainNode.gain.setValueAtTime(0, time + 0.1);
+                    }
+                    break;
+                    
+                default:
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(config.frequency, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            }
+            
+            // Start and stop
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + duration);
+            
+            // Store reference
+            appState.currentAudio = {
+                oscillator,
+                gainNode,
+                filter
+            };
+            
+            // Call callback when done
+            setTimeout(() => {
+                callback();
+                appState.currentAudio = null;
+            }, duration * 1000);
+        }
+
+        // Stop currently playing sound
+        function stopCurrentSound() {
+            if (appState.currentAudio) {
+                try {
+                    appState.currentAudio.oscillator.stop();
+                    appState.currentAudio.gainNode.disconnect();
+                } catch (e) {
+                    console.log('Error stopping audio:', e);
+                }
+                appState.currentAudio = null;
+            }
+        }
+
+        // Send sound to manikin
+        function sendToManikin(system, location, soundType) {
+            if (!appState.connected) {
+                alert('❌ Please connect to the manikin first!');
+                return;
+            }
+            
+            console.log(`📡 Sending to manikin: ${system} - ${location} - ${soundType}`);
+            
+            // Show sending feedback
+            const button = event.target.closest('.audio-btn');
+            if (button) {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span class="audio-icon">⏳</span> Sending...';
+                button.disabled = true;
+                
+                // Simulate sending to manikin
+                setTimeout(() => {
+                    button.innerHTML = '<span class="audio-icon">✓</span> Sent!';
+                    button.style.background = '#28a745';
+                    
+                    // Get sound config for notification
+                    const soundConfig = appState.audioLibrary[system][soundType];
+                    alert(`✅ Sound sent to ${appState.connectedDevice.name}!\n\n` +
+                          `System: ${system.charAt(0).toUpperCase() + system.slice(1)}\n` +
+                          `Location: ${location}\n` +
+                          `Sound: ${soundConfig.description}\n\n` +
+                          `The manikin will now play this sound at the specified location.`);
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = '';
+                        button.disabled = false;
+                    }, 2000);
+                }, 1000);
+            }
+        }
 
         // Role Selection
         function selectRole(role) {
