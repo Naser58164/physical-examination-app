@@ -375,6 +375,36 @@
             font-size: 1.8em;
         }
 
+        /* Examiner Login Form */
+        .login-form {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+        }
+
+        .login-form h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            user-select: none;
+            font-size: 1.2em;
+        }
+
         .form-group {
             margin-bottom: 25px;
         }
@@ -814,6 +844,29 @@
                 </div>
             </div>
 
+            <!-- Examiner Login Form -->
+            <div id="examinerLoginForm" class="login-form hidden">
+                <h2>🔒 Examiner Login</h2>
+                <div class="form-group">
+                    <label for="examinerPassword">Password *</label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="examinerPassword" 
+                            placeholder="Enter examiner password"
+                            onkeypress="if(event.key==='Enter') loginExaminer()"
+                        >
+                        <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
+                    </div>
+                    <span class="error-message" id="passwordError">Incorrect password. Please try again.</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn" onclick="loginExaminer()">Login</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelExaminerLogin()">Cancel</button>
+                </div>
+            </div>
+
             <!-- Examinee Registration Form -->
             <div id="registrationForm" class="registration-form hidden">
                 <h2>👤 Examinee Registration</h2>
@@ -1036,6 +1089,57 @@
                 <div class="action-buttons">
                     <button class="btn" onclick="applyAllSettings()">Apply All Settings to Manikin</button>
                     <button class="btn btn-secondary" onclick="resetAllSounds()">Reset All to Normal</button>
+                    <button class="btn" onclick="showAudioUploadModal()" style="background: #17a2b8;">📁 Upload Custom Audio Files</button>
+                </div>
+            </div>
+
+            <!-- Audio Upload Modal -->
+            <div id="audioUploadModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📁 Upload Custom Audio Files</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p style="margin-bottom: 20px; color: #666;">
+                            Upload your own audio files (MP3, WAV, OGG) to replace synthesized sounds.
+                            Select the sound type and upload the corresponding audio file.
+                        </p>
+                        
+                        <div class="form-group">
+                            <label for="audioSystem">System</label>
+                            <select id="audioSystem" onchange="updateSoundTypeOptions()">
+                                <option value="respiratory">Respiratory System</option>
+                                <option value="cardiac">Cardiac System</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="audioSoundType">Sound Type</label>
+                            <select id="audioSoundType">
+                                <option value="normal">Normal Breath Sounds</option>
+                                <option value="wheeze">Wheezing</option>
+                                <option value="crackles">Crackles (Rales)</option>
+                                <option value="rhonchi">Rhonchi</option>
+                                <option value="stridor">Stridor</option>
+                                <option value="diminished">Diminished</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="audioFileInput">Audio File</label>
+                            <input type="file" id="audioFileInput" accept="audio/*" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        </div>
+                        
+                        <div id="uploadedFilesList" style="margin-top: 20px;">
+                            <h4 style="color: #333; margin-bottom: 10px;">Uploaded Custom Audio Files:</h4>
+                            <div id="customAudioList" style="max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="uploadCustomAudio()">Upload</button>
+                        <button class="btn btn-secondary" onclick="closeAudioUploadModal()">Close</button>
+                    </div>
                 </div>
             </div>
 
@@ -1272,6 +1376,8 @@
             connected: false,
             connectionType: null,
             connectedDevice: null,
+            examinerAuthenticated: false,
+            examinerPassword: 'NHtest@2025', // Examiner password
             examineeInfo: {
                 name: '',
                 staffId: ''
@@ -1280,6 +1386,7 @@
             audioContext: null,
             currentAudio: null,
             audioLibrary: {},
+            audioFiles: {}, // For custom audio files
             // Examiner's correct answers (what they set)
             examinerSettings: {
                 respiratory: {
@@ -1451,7 +1558,15 @@
             // Stop any currently playing sound
             stopCurrentSound();
             
-            // Get sound config
+            // Check if custom audio file exists for this sound
+            const audioFileKey = `${system}-${soundType}`;
+            if (appState.audioFiles[audioFileKey]) {
+                // Play custom audio file
+                playCustomAudio(appState.audioFiles[audioFileKey], soundType);
+                return;
+            }
+            
+            // Get sound config for synthesized sound
             const soundConfig = appState.audioLibrary[system][soundType];
             
             if (!soundConfig) {
@@ -1478,6 +1593,85 @@
             // Show sound description
             console.log(`🔊 Playing: ${soundConfig.description}`);
             alert(`🔊 Playing ${soundConfig.description}\n\nDuration: ${soundConfig.duration}s`);
+        }
+
+        // Play custom audio file
+        function playCustomAudio(audioData, soundType) {
+            console.log(`Playing custom audio for: ${soundType}`);
+            
+            // Show playing feedback
+            const button = event.target.closest('.audio-btn');
+            if (button) {
+                button.classList.add('playing');
+                button.disabled = true;
+            }
+            
+            // Create audio element
+            const audio = new Audio(audioData);
+            appState.currentAudio = { audio };
+            
+            audio.onended = () => {
+                if (button) {
+                    button.classList.remove('playing');
+                    button.disabled = false;
+                }
+                appState.currentAudio = null;
+            };
+            
+            audio.onerror = () => {
+                alert('Error playing audio file. Please check the file format.');
+                if (button) {
+                    button.classList.remove('playing');
+                    button.disabled = false;
+                }
+                appState.currentAudio = null;
+            };
+            
+            audio.play().catch(err => {
+                console.error('Audio play error:', err);
+                alert('Cannot play audio. Browser may be blocking autoplay.');
+                if (button) {
+                    button.classList.remove('playing');
+                    button.disabled = false;
+                }
+            });
+            
+            alert(`🔊 Playing custom audio: ${soundType}`);
+        }
+
+        // Load custom audio file
+        function loadCustomAudioFile(system, soundType, file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    reject('No file provided');
+                    return;
+                }
+                
+                // Check file type
+                if (!file.type.startsWith('audio/')) {
+                    reject('File must be an audio file (MP3, WAV, OGG)');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    const audioData = e.target.result;
+                    const audioFileKey = `${system}-${soundType}`;
+                    
+                    // Store in state
+                    appState.audioFiles[audioFileKey] = audioData;
+                    
+                    console.log(`Loaded custom audio: ${audioFileKey}`);
+                    resolve(audioFileKey);
+                };
+                
+                reader.onerror = () => {
+                    reject('Error reading audio file');
+                };
+                
+                reader.readAsDataURL(file);
+            });
         }
 
         // Synthesize sound using Web Audio API
@@ -1626,8 +1820,15 @@
         function stopCurrentSound() {
             if (appState.currentAudio) {
                 try {
-                    appState.currentAudio.oscillator.stop();
-                    appState.currentAudio.gainNode.disconnect();
+                    if (appState.currentAudio.audio) {
+                        // Stop HTML5 Audio (custom file)
+                        appState.currentAudio.audio.pause();
+                        appState.currentAudio.audio.currentTime = 0;
+                    } else if (appState.currentAudio.oscillator) {
+                        // Stop Web Audio API (synthesized)
+                        appState.currentAudio.oscillator.stop();
+                        appState.currentAudio.gainNode.disconnect();
+                    }
                 } catch (e) {
                     console.log('Error stopping audio:', e);
                 }
@@ -1658,10 +1859,13 @@
                     
                     // Get sound config for notification
                     const soundConfig = appState.audioLibrary[system][soundType];
+                    const audioFileKey = `${system}-${soundType}`;
+                    const isCustom = appState.audioFiles[audioFileKey] ? ' (Custom Audio)' : '';
+                    
                     alert(`✅ Sound sent to ${appState.connectedDevice.name}!\n\n` +
                           `System: ${system.charAt(0).toUpperCase() + system.slice(1)}\n` +
                           `Location: ${location}\n` +
-                          `Sound: ${soundConfig.description}\n\n` +
+                          `Sound: ${soundConfig.description}${isCustom}\n\n` +
                           `The manikin will now play this sound at the specified location.`);
                     
                     setTimeout(() => {
@@ -1673,6 +1877,114 @@
             }
         }
 
+        // Audio Upload Modal Functions
+        function showAudioUploadModal() {
+            const modal = document.getElementById('audioUploadModal');
+            modal.classList.add('show');
+            updateCustomAudioList();
+        }
+
+        function closeAudioUploadModal() {
+            const modal = document.getElementById('audioUploadModal');
+            modal.classList.remove('show');
+            document.getElementById('audioFileInput').value = '';
+        }
+
+        function updateSoundTypeOptions() {
+            const system = document.getElementById('audioSystem').value;
+            const soundTypeSelect = document.getElementById('audioSoundType');
+            
+            soundTypeSelect.innerHTML = '';
+            
+            if (system === 'respiratory') {
+                soundTypeSelect.innerHTML = `
+                    <option value="normal">Normal Breath Sounds</option>
+                    <option value="wheeze">Wheezing</option>
+                    <option value="crackles">Crackles (Rales)</option>
+                    <option value="rhonchi">Rhonchi</option>
+                    <option value="stridor">Stridor</option>
+                    <option value="diminished">Diminished</option>
+                    <option value="absent">Absent</option>
+                `;
+            } else {
+                soundTypeSelect.innerHTML = `
+                    <option value="normal">Normal S1-S2</option>
+                    <option value="murmur-systolic">Systolic Murmur</option>
+                    <option value="murmur-diastolic">Diastolic Murmur</option>
+                    <option value="s3">S3 Gallop</option>
+                    <option value="s4">S4 Gallop</option>
+                    <option value="split">Split S2</option>
+                    <option value="stenosis">Stenosis</option>
+                    <option value="regurgitation">Regurgitation</option>
+                    <option value="prolapse">Mitral Valve Prolapse</option>
+                `;
+            }
+        }
+
+        function uploadCustomAudio() {
+            const system = document.getElementById('audioSystem').value;
+            const soundType = document.getElementById('audioSoundType').value;
+            const fileInput = document.getElementById('audioFileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an audio file first!');
+                return;
+            }
+            
+            // Show loading
+            const uploadBtn = event.target;
+            const originalText = uploadBtn.textContent;
+            uploadBtn.textContent = 'Uploading...';
+            uploadBtn.disabled = true;
+            
+            loadCustomAudioFile(system, soundType, file)
+                .then((audioFileKey) => {
+                    alert(`✅ Audio file uploaded successfully!\n\nSystem: ${system}\nSound: ${soundType}\n\nThis custom audio will now play when you select "${soundType}" for ${system} sounds.`);
+                    updateCustomAudioList();
+                    fileInput.value = '';
+                    uploadBtn.textContent = originalText;
+                    uploadBtn.disabled = false;
+                })
+                .catch((error) => {
+                    alert(`❌ Error: ${error}`);
+                    uploadBtn.textContent = originalText;
+                    uploadBtn.disabled = false;
+                });
+        }
+
+        function updateCustomAudioList() {
+            const listDiv = document.getElementById('customAudioList');
+            const audioFiles = appState.audioFiles;
+            
+            if (Object.keys(audioFiles).length === 0) {
+                listDiv.innerHTML = '<p style="color: #999; font-style: italic;">No custom audio files uploaded yet.</p>';
+                return;
+            }
+            
+            let html = '';
+            for (const key in audioFiles) {
+                const [system, soundType] = key.split('-');
+                html += `
+                    <div style="padding: 10px; background: white; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${system.charAt(0).toUpperCase() + system.slice(1)}</strong> - ${soundType}
+                        </div>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.9em;" onclick="removeCustomAudio('${key}')">Remove</button>
+                    </div>
+                `;
+            }
+            listDiv.innerHTML = html;
+        }
+
+        function removeCustomAudio(audioFileKey) {
+            if (confirm('Are you sure you want to remove this custom audio file?')) {
+                delete appState.audioFiles[audioFileKey];
+                updateCustomAudioList();
+                alert('Custom audio file removed successfully!');
+            }
+        }
+
         // Role Selection
         function selectRole(role) {
             appState.currentRole = role;
@@ -1680,11 +1992,79 @@
             document.getElementById('backButton').classList.remove('hidden');
             
             if (role === 'examiner') {
-                document.getElementById('headerSubtitle').textContent = 'Examiner Control Panel';
-                document.getElementById('examinerInterface').classList.remove('hidden');
+                document.getElementById('headerSubtitle').textContent = 'Examiner Login';
+                document.getElementById('examinerLoginForm').classList.remove('hidden');
             } else {
                 document.getElementById('headerSubtitle').textContent = 'Examinee Registration';
                 document.getElementById('registrationForm').classList.remove('hidden');
+            }
+        }
+
+        // Examiner Login Functions
+        function loginExaminer() {
+            const password = document.getElementById('examinerPassword').value;
+            const errorMsg = document.getElementById('passwordError');
+            
+            console.log('Login attempt...');
+            
+            // Clear previous error
+            document.getElementById('examinerPassword').classList.remove('error');
+            errorMsg.classList.remove('show');
+            
+            // Validate password
+            if (password === appState.examinerPassword) {
+                // Correct password
+                appState.examinerAuthenticated = true;
+                
+                // Hide login form, show examiner interface
+                document.getElementById('examinerLoginForm').classList.add('hidden');
+                document.getElementById('examinerInterface').classList.remove('hidden');
+                document.getElementById('headerSubtitle').textContent = 'Examiner Control Panel';
+                
+                // Clear password field
+                document.getElementById('examinerPassword').value = '';
+                
+                console.log('Examiner authenticated successfully');
+                
+                // Show welcome message
+                setTimeout(() => {
+                    alert('✅ Welcome, Examiner!\n\nYou now have full access to control sounds and configure training scenarios.');
+                }, 100);
+            } else {
+                // Incorrect password
+                document.getElementById('examinerPassword').classList.add('error');
+                errorMsg.classList.add('show');
+                document.getElementById('examinerPassword').value = '';
+                document.getElementById('examinerPassword').focus();
+                
+                console.log('Authentication failed');
+            }
+        }
+
+        function cancelExaminerLogin() {
+            document.getElementById('examinerLoginForm').classList.add('hidden');
+            document.getElementById('roleSelection').classList.remove('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('headerSubtitle').textContent = 'Select your role to begin';
+            
+            // Clear form
+            document.getElementById('examinerPassword').value = '';
+            document.getElementById('examinerPassword').classList.remove('error');
+            document.getElementById('passwordError').classList.remove('show');
+            
+            appState.currentRole = null;
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('examinerPassword');
+            const toggleIcon = event.target;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
             }
         }
 
@@ -1692,6 +2072,7 @@
         document.getElementById('backButton').addEventListener('click', function() {
             document.getElementById('roleSelection').classList.remove('hidden');
             document.getElementById('examinerInterface').classList.add('hidden');
+            document.getElementById('examinerLoginForm').classList.add('hidden');
             document.getElementById('registrationForm').classList.add('hidden');
             document.getElementById('examineeInterface').classList.add('hidden');
             document.getElementById('backButton').classList.add('hidden');
@@ -1710,6 +2091,12 @@
             appState.examineeInfo = { name: '', staffId: '' };
             document.getElementById('examineeName').value = '';
             document.getElementById('staffId').value = '';
+            
+            // Clear examiner authentication
+            appState.examinerAuthenticated = false;
+            document.getElementById('examinerPassword').value = '';
+            document.getElementById('examinerPassword').classList.remove('error');
+            document.getElementById('passwordError').classList.remove('show');
             
             appState.currentRole = null;
         });
